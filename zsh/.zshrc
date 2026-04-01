@@ -32,12 +32,15 @@ zinit snippet OMZL::theme-and-appearance.zsh
 # Oh My Zsh plugins
 zinit snippet OMZP::extract
 zinit snippet OMZP::git
+zinit snippet OMZP::sudo
 
 # fish-like features
 zinit light Aloxaf/fzf-tab
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-history-substring-search
+
+zinit light MichaelAquilina/zsh-you-should-use
 
 zinit ice as"program" from"gh-r" pick"zsh-patina-*/zsh-patina" atload'eval "$(zsh-patina activate)"'
 zinit light michel-kraemer/zsh-patina
