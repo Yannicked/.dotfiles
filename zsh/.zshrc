@@ -25,6 +25,8 @@ zinit snippet OMZL::theme-and-appearance.zsh
 zinit snippet OMZP::extract
 zinit snippet OMZP::git
 zinit snippet OMZP::sudo
+zstyle :omz:plugins:ssh-agent lazy yes
+zinit snippet OMZP::ssh-agent
 
 # fish-like features
 zinit light Aloxaf/fzf-tab
