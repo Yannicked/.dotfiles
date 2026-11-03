@@ -1,3 +1,4 @@
+typeset -U path
 HISTFILE=~/.histfile  # sizes are set by OMZL::history.zsh
 bindkey -e
 
@@ -38,17 +39,18 @@ bindkey '^[[B' history-substring-search-down
 
 zinit light MichaelAquilina/zsh-you-should-use
 
-zinit ice as"program" from"gh-r" pick"zsh-patina-*/zsh-patina" atload'eval "$(zsh-patina activate)" && eval "$(zsh-patina completion)"'
+zinit ice as"program" from"gh-r" pick"zsh-patina-*/zsh-patina" atload'eval "$(zsh-patina activate)"'
 zinit light michel-kraemer/zsh-patina
 
 # Initialize completions after all plugins are loaded
 autoload -Uz compinit && compinit
 zicdreplay
+eval "$(zsh-patina completion)"
 
 prompt_newline='%666v '
 PROMPT=" $PROMPT"
 
 # Pi
-export PATH="$HOME/.pi/agent/bin:$PATH"
+path=("$HOME/.pi/agent/bin" $path)
 
-export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+path+=(/opt/nvim-linux-x86_64/bin)
