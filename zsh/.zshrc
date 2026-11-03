@@ -1,17 +1,9 @@
-# Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
+HISTFILE=~/.histfile  # sizes are set by OMZL::history.zsh
 bindkey -e
-# End of lines configured by zsh-newuser-install
-# The following lines were added by compinstall
-zstyle :compinstall filename '/home/yannick/.zshrc'
 
-autoload -Uz compinit
-compinit
-# End of lines added by compinstall
-
-# Zinit plugin manager (submodule)
+# Zinit plugin manager (submodule); plugins/snippets live outside the repo
+declare -A ZINIT
+ZINIT[HOME_DIR]="$HOME/.local/share/zinit"
 source "${ZDOTDIR:-$HOME}/.zinit/zinit.zsh"
 
 # rupa/z - directory jumping
@@ -39,14 +31,20 @@ zinit light Aloxaf/fzf-tab
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-history-substring-search
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
 
 zinit light MichaelAquilina/zsh-you-should-use
 
-zinit ice as"program" from"gh-r" pick"zsh-patina-*/zsh-patina" atload'eval "$(zsh-patina activate)"'
+zinit ice as"program" from"gh-r" pick"zsh-patina-*/zsh-patina" atload'eval "$(zsh-patina activate)" && eval "$(zsh-patina completion)"'
 zinit light michel-kraemer/zsh-patina
 
-export SSH_ASKPASS="/usr/bin/ksshaskpass"
-export GIT_ASKPASS="/usr/bin/ksshaskpass"
+# Initialize completions after all plugins are loaded
+autoload -Uz compinit && compinit
+zicdreplay
 
 prompt_newline='%666v '
 PROMPT=" $PROMPT"
+
+# Pi
+export PATH="$HOME/.pi/agent/bin:$PATH"
