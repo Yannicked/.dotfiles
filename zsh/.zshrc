@@ -50,3 +50,5 @@ PROMPT=" $PROMPT"
 
 # Pi
 export PATH="$HOME/.pi/agent/bin:$PATH"
+
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
