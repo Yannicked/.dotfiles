@@ -17,6 +17,7 @@ return {
 				{ "<leader>s", group = "search" },
 				{ "<leader>g", group = "git" },
 				{ "<leader>c", group = "code" },
+				{ "<leader>r", group = "run (tmux)" },
 			},
 		},
 	},

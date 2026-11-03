@@ -1,13 +1,88 @@
 return {
-  -- Seamless <C-h/j/k/l> between nvim splits and tmux panes (tmux side in tmux.conf)
+  -- Seamless <C-h/j/k/l> between nvim splits and tmux panes, <M-h/j/k/l> to resize
+  -- both. It sets the tmux pane option @pane-is-vim that tmux.conf checks.
   {
-    "christoomey/vim-tmux-navigator",
-    cmd = { "TmuxNavigateLeft", "TmuxNavigateDown", "TmuxNavigateUp", "TmuxNavigateRight" },
+    "smart-splits-nvim/smart-splits.nvim",
+    lazy = false, -- must load at startup to set @pane-is-vim
+    dependencies = {
+      { "smart-splits-nvim/backend-tmux", main = "smart-splits-backend-tmux", opts = {} },
+    },
+    opts = {
+      mux = { backend = "smart-splits-backend-tmux" },
+      move = { at_edge = "stop" }, -- keep in step with tmux.conf bindings
+    },
     keys = {
-      { "<C-h>", "<cmd>TmuxNavigateLeft<CR>" },
-      { "<C-j>", "<cmd>TmuxNavigateDown<CR>" },
-      { "<C-k>", "<cmd>TmuxNavigateUp<CR>" },
-      { "<C-l>", "<cmd>TmuxNavigateRight<CR>" },
+      { "<C-h>", function() require("smart-splits").move_cursor_left() end, desc = "Go to left split/pane" },
+      { "<C-j>", function() require("smart-splits").move_cursor_down() end, desc = "Go to lower split/pane" },
+      { "<C-k>", function() require("smart-splits").move_cursor_up() end, desc = "Go to upper split/pane" },
+      { "<C-l>", function() require("smart-splits").move_cursor_right() end, desc = "Go to right split/pane" },
+      { "<M-h>", function() require("smart-splits").resize_left() end, desc = "Resize left" },
+      { "<M-j>", function() require("smart-splits").resize_down() end, desc = "Resize down" },
+      { "<M-k>", function() require("smart-splits").resize_up() end, desc = "Resize up" },
+      { "<M-l>", function() require("smart-splits").resize_right() end, desc = "Resize right" },
+      { "<leader><C-h>", function() require("smart-splits").swap_buf_left() end, desc = "Swap buffer left" },
+      { "<leader><C-j>", function() require("smart-splits").swap_buf_down() end, desc = "Swap buffer down" },
+      { "<leader><C-k>", function() require("smart-splits").swap_buf_up() end, desc = "Swap buffer up" },
+      { "<leader><C-l>", function() require("smart-splits").swap_buf_right() end, desc = "Swap buffer right" },
+    },
+  },
+
+  -- Run shell commands in a tmux pane (opens a split below if needed)
+  {
+    "preservim/vimux",
+    cmd = { "VimuxRunCommand", "VimuxPromptCommand", "VimuxRunLastCommand" },
+    init = function()
+      vim.g.VimuxHeight = "30%"
+      vim.g.VimuxOrientation = "v"
+      vim.g.VimuxUseNearest = 1 -- reuse an existing pane in the window
+    end,
+    keys = {
+      { "<leader>rp", "<cmd>VimuxPromptCommand<CR>", desc = "Run command in pane" },
+      { "<leader>rl", "<cmd>VimuxRunLastCommand<CR>", desc = "Rerun last command" },
+      { "<leader>ri", "<cmd>VimuxInspectRunner<CR>", desc = "Inspect runner pane" },
+      { "<leader>rz", "<cmd>VimuxZoomRunner<CR>", desc = "Zoom runner pane" },
+      { "<leader>rc", "<cmd>VimuxInterruptRunner<CR>", desc = "Interrupt (C-c) runner" },
+      { "<leader>rq", "<cmd>VimuxCloseRunner<CR>", desc = "Close runner pane" },
+      {
+        "<leader>rt",
+        function()
+          local cmds = {
+            go = "go test ./...",
+            rust = "cargo test",
+            c = "make test",
+            cpp = "make test",
+          }
+          local cmd = cmds[vim.bo.filetype] or "make test"
+          vim.cmd.write()
+          vim.fn.VimuxRunCommand(cmd)
+        end,
+        desc = "Run project tests",
+      },
+      {
+        "<leader>rb",
+        function()
+          local cmds = { go = "go build ./...", rust = "cargo build" }
+          vim.cmd.write()
+          vim.fn.VimuxRunCommand(cmds[vim.bo.filetype] or "make")
+        end,
+        desc = "Build project",
+      },
+      {
+        "<leader>rs",
+        function()
+          local mode = vim.fn.mode()
+          local text
+          if mode == "v" or mode == "V" or mode == "\22" then
+            text = table.concat(vim.fn.getregion(vim.fn.getpos("v"), vim.fn.getpos("."), { type = mode }), "\n")
+            vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "n", false)
+          else
+            text = vim.api.nvim_get_current_line()
+          end
+          vim.fn.VimuxRunCommand(text)
+        end,
+        mode = { "n", "x" },
+        desc = "Send line/selection to pane",
+      },
     },
   },
 

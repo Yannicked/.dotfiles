@@ -18,6 +18,24 @@ au("BufReadPost", {
   end,
 })
 
+-- Reload files changed outside nvim (git checkout, formatters, other tmux panes).
+-- tmux forwards focus events (focus-events on), so FocusGained fires on pane switch.
+vim.o.autoread = true
+au({ "FocusGained", "BufEnter", "TermClose", "TermLeave" }, {
+  group = group,
+  callback = function()
+    if vim.o.buftype ~= "nofile" and vim.fn.getcmdwintype() == "" then
+      vim.cmd.checktime()
+    end
+  end,
+})
+au("FileChangedShellPost", {
+  group = group,
+  callback = function(args)
+    vim.notify("Reloaded " .. vim.fn.fnamemodify(args.file, ":~:."), vim.log.levels.INFO)
+  end,
+})
+
 -- Go uses tabs
 au("FileType", {
   group = group,
